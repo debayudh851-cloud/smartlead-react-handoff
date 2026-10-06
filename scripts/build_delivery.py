@@ -36,7 +36,7 @@ def main():
     for folder in ['backend', 'ml', 'scripts', 'react-handoff']:
         shutil.copytree(FULL / folder, HANDOFF / folder, dirs_exist_ok=True)
     (HANDOFF / 'docs').mkdir(exist_ok=True)
-    for name in ['API_CONTRACT.md', 'SETUP.md', 'IMPLEMENTATION_DECISIONS.md', 'VERIFICATION_CURRENT.md', 'openapi.yaml']:
+    for name in ['API_CONTRACT.md', 'SETUP.md', 'IMPLEMENTATION_DECISIONS.md', 'VERIFICATION_CURRENT.md', 'ROLE_PORTALS.md', 'openapi.yaml']:
         shutil.copy2(FULL/'docs'/name, HANDOFF/'docs'/name)
     shutil.copytree(FULL/'postman', HANDOFF/'postman', dirs_exist_ok=True)
     shutil.copy2(FULL/'.gitignore', HANDOFF/'.gitignore')

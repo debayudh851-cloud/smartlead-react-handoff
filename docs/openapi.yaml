@@ -262,6 +262,29 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/admin/login/:
+    post:
+      operationId: admin_login_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleLoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoleLoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoleLoginRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
   /api/admin/packages/:
     get:
       operationId: admin_packages_list
@@ -408,6 +431,32 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/admin/register/:
+    post:
+      operationId: admin_register_create
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminRegistrationResponse'
+          description: ''
   /api/admin/reset-password/:
     post:
       operationId: admin_reset_password_create
@@ -1949,6 +1998,82 @@ paths:
               schema:
                 $ref: '#/components/schemas/Service'
           description: ''
+  /api/superuser/admin-registrations/:
+    get:
+      operationId: superuser_admin_registrations_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - superuser
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAdminRegistrationList'
+          description: ''
+  /api/superuser/admin-registrations/{id}/decision/:
+    post:
+      operationId: superuser_admin_registrations_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - superuser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminDecisionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AdminDecisionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AdminDecisionRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminRegistration'
+          description: ''
+  /api/superuser/login/:
+    post:
+      operationId: superuser_login_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - superuser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleLoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoleLoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoleLoginRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
   /api/token/:
     post:
       operationId: token_create
@@ -2055,6 +2180,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
           description: ''
+  /api/user/login/:
+    post:
+      operationId: user_login_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleLoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoleLoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoleLoginRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
   /api/user/register/:
     post:
       operationId: user_register_create
@@ -2192,6 +2340,83 @@ paths:
           description: No response body
 components:
   schemas:
+    AdminDecisionRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/AdminDecisionStatusEnum'
+      required:
+      - status
+    AdminDecisionStatusEnum:
+      enum:
+      - APPROVED
+      - REJECTED
+      type: string
+      description: |-
+        * `APPROVED` - APPROVED
+        * `REJECTED` - REJECTED
+    AdminRegistration:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AdminRegistrationStatusEnum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        reviewed_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - email
+      - id
+      - reviewed_at
+      - reviewed_by
+      - status
+      - user
+      - username
+    AdminRegistrationResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        registration_id:
+          type: integer
+      required:
+      - message
+      - registration_id
+    AdminRegistrationStatusEnum:
+      enum:
+      - PENDING
+      - APPROVED
+      - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
     AnalyticsSummary:
       type: object
       properties:
@@ -2571,7 +2796,7 @@ components:
           type: integer
           nullable: true
         status:
-          $ref: '#/components/schemas/StatusEnum'
+          $ref: '#/components/schemas/LeadStatusEnum'
         converted_at:
           type: string
           format: date-time
@@ -2597,6 +2822,22 @@ components:
       - id
       - latest_prediction
       - updated_at
+    LeadStatusEnum:
+      enum:
+      - NEW
+      - CONTACTED
+      - FOLLOW_UP
+      - QUALIFIED
+      - CONVERTED
+      - NOT_CONVERTED
+      type: string
+      description: |-
+        * `NEW` - New
+        * `CONTACTED` - Contacted
+        * `FOLLOW_UP` - Follow Up
+        * `QUALIFIED` - Qualified
+        * `CONVERTED` - Converted
+        * `NOT_CONVERTED` - Not Converted
     LogoutRequest:
       type: object
       properties:
@@ -2683,6 +2924,29 @@ components:
       - name
       - price
       - service
+    PaginatedAdminRegistrationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminRegistration'
     PaginatedCategoryList:
       type: object
       required:
@@ -3113,7 +3377,7 @@ components:
           type: integer
           nullable: true
         status:
-          $ref: '#/components/schemas/StatusEnum'
+          $ref: '#/components/schemas/LeadStatusEnum'
     PatchedNotificationRequest:
       type: object
       properties:
@@ -3446,6 +3710,20 @@ components:
       - comment
       - rating
       - service
+    RoleLoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - password
+      - username
     SEO:
       type: object
       properties:
@@ -3590,22 +3868,6 @@ components:
       - name
       - slug
       - starting_price
-    StatusEnum:
-      enum:
-      - NEW
-      - CONTACTED
-      - FOLLOW_UP
-      - QUALIFIED
-      - CONVERTED
-      - NOT_CONVERTED
-      type: string
-      description: |-
-        * `NEW` - New
-        * `CONTACTED` - Contacted
-        * `FOLLOW_UP` - Follow Up
-        * `QUALIFIED` - Qualified
-        * `CONVERTED` - Converted
-        * `NOT_CONVERTED` - Not Converted
     TokenObtainPair:
       type: object
       properties:
@@ -3704,9 +3966,13 @@ components:
           title: Superuser status
           description: Designates that this user has all permissions without explicitly
             assigning them.
+        role:
+          type: string
+          readOnly: true
       required:
       - email
       - id
+      - role
       - username
     UserRegistrationRequest:
       type: object

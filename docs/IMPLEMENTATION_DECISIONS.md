@@ -20,3 +20,8 @@ These decisions make version 1 concrete. They can be revised with reviewed migra
 - The raw Kaggle dataset is kept locally and excluded from public repositories/ZIP distribution. The downloader, source attribution, model metrics and training code are supplied. Dataset redistribution rights were not established from its generic Other license label.
 
 Deployment still requires approved origins, SMTP, TLS hosting, media storage, database backup/least-privilege roles, reminder scheduling, and real-domain model evaluation. This version is a working development handoff, not a deployed production service.
+
+
+## User, admin and superuser portals
+
+Separate interfaces are available at `/user/`, `/admin-portal/` and `/superuser/`. Admin registration requires superuser approval before requirement access. See [ROLE_PORTALS.md](ROLE_PORTALS.md) for PostgreSQL relationships, registration, role-specific login and API endpoints. Apply migrations when updating an existing installation.

@@ -11,3 +11,8 @@ Use `client.ts` as a reference service layer or generate types from `docs/openap
 The model is educational/demonstration-only; show is_demo and model_version wherever predictions are displayed. API prices are decimal strings; convert only for display. Follow-up datetimes require timezone-aware ISO 8601 values. Browser engagement is client-reported and must not be described as verified traffic analytics.
 
 Do not copy backend secrets into Vite environment variables. Client-visible environment values may contain API origin, never Django/PostgreSQL credentials.
+
+
+## User, admin and superuser portals
+
+Separate interfaces are available at `/user/`, `/admin-portal/` and `/superuser/`. Admin registration requires superuser approval before requirement access. See `docs/ROLE_PORTALS.md` for PostgreSQL relationships, registration, role-specific login and API endpoints. Apply migrations when updating an existing installation.

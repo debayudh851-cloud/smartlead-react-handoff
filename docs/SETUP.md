@@ -63,3 +63,8 @@ The test database role needs permission to create/drop the temporary PostgreSQL 
 ## Deployment
 
 Use a supported production WSGI/ASGI server, TLS, DEBUG=false, exact hosts/origins, secure cookies, SMTP, persistent media storage, backups and a shared throttle cache. Configure reminder scheduling and protect staff accounts. Swagger UI uses CDN assets and may require network access. No cloud deployment has been performed.
+
+
+## User, admin and superuser portals
+
+Separate interfaces are available at `/user/`, `/admin-portal/` and `/superuser/`. Admin registration requires superuser approval before requirement access. See [ROLE_PORTALS.md](ROLE_PORTALS.md) for PostgreSQL relationships, registration, role-specific login and API endpoints. Apply migrations when updating an existing installation.

@@ -5,7 +5,7 @@ Verified locally on 6 October 2026 with Python 3.13, PostgreSQL 18 and requireme
 - PostgreSQL connection verified; smartlead database created if absent.
 - Built-in, business and JWT blacklist migrations applied successfully.
 - Django check: no issues. Migration consistency check: no model changes detected.
-- Full PostgreSQL regression run: 34 tests passed in 47.888 seconds against a temporary database.
+- Full PostgreSQL regression run: 38 tests passed in 67.020 seconds against a temporary database.
 - Coverage: authentication/recovery, permission boundaries, enquiry/lead transaction rollback, idempotent retries, lead transitions/assignment/history, wishlist/review ownership/moderation, profile privilege protection, logout/password-change revocation, reminder idempotency, unavailable prediction handling and prediction storage.
 - OpenAPI generated and validated with no generation warnings/errors after annotations were added.
 - pip check: no broken requirements. Frontend JavaScript syntax checked with Node.
@@ -16,3 +16,7 @@ Verified locally on 6 October 2026 with Python 3.13, PostgreSQL 18 and requireme
 Postman files are prepared, not proof of manual execution. SMTP inbox delivery, separate React integration, production hosting and real-domain ML performance remain unverified. Reminder scheduling is a deployment responsibility.
 
 Source PDF and historical planning documents are retained; older test counts/layouts do not override this release record.
+
+## Three-interface update
+
+Migration business.0002_adminregistration applied to local PostgreSQL. Role-specific login tests cover all nine user/admin/superuser combinations, public registration privilege injection, pending/approved/rejected admin applications, account filters, superuser-only decisions, approved admin requirement access and self-deactivation protection. Three signed-out portal pages inspected in the browser. Authenticated workflows were verified by API tests; no real user credentials were created for browser testing.

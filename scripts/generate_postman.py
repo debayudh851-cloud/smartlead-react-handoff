@@ -63,7 +63,7 @@ for path, operations in schema['paths'].items():
             headers.append({'key':'Idempotency-Key','value':'{{idempotency_key}}'})
         item={'name':method.upper()+' '+path,'request':request,'response':[]}
         item['event']=[{'listen':'test','script':{'type':'text/javascript','exec':['pm.test("Response is not a server error", function () { pm.expect(pm.response.code).to.be.below(500); });']}}]
-        if method=='post' and path in {'/api/auth/login/','/api/token/'}:
+        if method=='post' and path in {'/api/auth/login/','/api/token/','/api/user/login/','/api/admin/login/','/api/superuser/login/'}:
             item['event'][0]['script']['exec'] += ['if (pm.response.code === 200) { const data = pm.response.json(); pm.environment.set("access", data.access); pm.environment.set("refresh", data.refresh); }']
         group=path.removeprefix('/api/').split('/')[0]
         folders.setdefault(group,[]).append(item)

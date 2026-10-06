@@ -222,9 +222,14 @@ class PredictRequestSerializer(serializers.Serializer):
 
 
 class UserManagementSerializer(serializers.ModelSerializer):
+    role = serializers.SerializerMethodField()
+
+    def get_role(self, obj) -> str:
+        return 'SUPER_ADMIN' if obj.is_superuser else 'ADMIN' if obj.is_staff else 'GENERAL_USER'
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'is_active', 'is_staff', 'is_superuser']
+        fields = ['id', 'username', 'email', 'is_active', 'is_staff', 'is_superuser', 'role']
         read_only_fields = ['id', 'username', 'email']
 
     def validate(self, attrs):

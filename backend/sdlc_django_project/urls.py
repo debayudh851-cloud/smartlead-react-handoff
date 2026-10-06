@@ -22,8 +22,18 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from django.conf import settings
 from django.conf.urls.static import static
 from api.views import user_register
+from business.roles import portal, RoleLoginView, AdminRegisterView, AdminRegistrationList, AdminDecisionView
 
 urlpatterns = [
+    path('user/', portal, {'role': 'user'}, name='user-portal'),
+    path('admin-portal/', portal, {'role': 'admin'}, name='admin-portal'),
+    path('superuser/', portal, {'role': 'superuser'}, name='superuser-portal'),
+    path('api/user/login/', RoleLoginView.as_view(portal_role='user')),
+    path('api/admin/login/', RoleLoginView.as_view(portal_role='admin')),
+    path('api/superuser/login/', RoleLoginView.as_view(portal_role='superuser')),
+    path('api/admin/register/', AdminRegisterView.as_view()),
+    path('api/superuser/admin-registrations/', AdminRegistrationList.as_view()),
+    path('api/superuser/admin-registrations/<int:pk>/decision/', AdminDecisionView.as_view()),
     path('', TemplateView.as_view(template_name='business/home.html'), name='home'),
     path('accounts/', TemplateView.as_view(template_name='api/index.html'), name='accounts'),
     path('<str:role>/reset-password/<str:uid>/<str:token>/', TemplateView.as_view(template_name='api/index.html'), name='reset-page'),

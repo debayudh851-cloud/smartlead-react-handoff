@@ -332,6 +332,19 @@ class UserManagementViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserManagementSerializer
     permission_classes = [SuperAdminOnly]
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        role = self.request.query_params.get('role')
+        if role == 'user':
+            return qs.filter(is_staff=False, is_superuser=False)
+        if role == 'admin':
+            return qs.filter(is_staff=True, is_superuser=False)
+        if role == 'superuser':
+            return qs.filter(is_superuser=True)
+        if role:
+            raise ValidationError({'role': 'Use user, admin or superuser.'})
+        return qs
+
     def partial_update(self, request, pk=None):
         serializer = self.get_serializer(self.get_object(), data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)

@@ -6,9 +6,20 @@ export type Role = 'GENERAL_USER' | 'ADMIN' | 'SUPER_ADMIN';
 export class SmartLeadClient {
   private tokens: Tokens | null = null;
   constructor(private base = 'http://127.0.0.1:8000/api') { this.base = base.replace(/\/$/, ''); }
-  async login(username: string, password: string) {
-    this.tokens = await this.request<Tokens>('auth/login/', 'POST', { username, password });
+  async login(username: string, password: string, portal: 'user' | 'admin' | 'superuser' = 'user') {
+    this.tokens = null;
+    this.tokens = await this.request<Tokens>(`${portal}/login/`, 'POST', { username, password });
     return this.request('auth/profile/');
+  }
+  register(username: string, email: string, password: string, portal: 'user' | 'admin' = 'user') {
+    return this.request(`${portal}/register/`, 'POST', { username, email, password });
+  }
+  accounts(role: '' | 'user' | 'admin' | 'superuser' = '') {
+    return this.request(`admin/accounts/?role=${role}`);
+  }
+  adminRegistrations() { return this.request('superuser/admin-registrations/'); }
+  decideAdmin(id: number, status: 'APPROVED' | 'REJECTED') {
+    return this.request(`superuser/admin-registrations/${id}/decision/`, 'POST', { status });
   }
   async logout() {
     try { if (this.tokens) await this.request('auth/logout/', 'POST', { refresh: this.tokens.refresh }); }

@@ -116,3 +116,8 @@ Success: 200 reads/updates/authentication, 201 creates, 204 delete/logout. Error
 Validation errors follow DRF field arrays, e.g. `{"budget":["Ensure this value is greater than or equal to 0."]}`. Auth/permission errors use `{"detail":"..."}`; existing recovery reset errors use `{"error":"..."}`. Handle all three formats. Unexpected production failures must show a generic frontend message; do not expose tracebacks. DEBUG must be false in deployment.
 
 For each endpoint test valid input, missing fields, bad values, missing authentication, insufficient role, missing object and response structure. Existing Postman YAML is historical; use the generated current JSON collection for this release. Do not mark manual Postman execution complete until actually performed.
+
+
+## User, admin and superuser portals
+
+Separate interfaces are available at `/user/`, `/admin-portal/` and `/superuser/`. Admin registration requires superuser approval before requirement access. See [ROLE_PORTALS.md](ROLE_PORTALS.md) for PostgreSQL relationships, registration, role-specific login and API endpoints. Apply migrations when updating an existing installation.

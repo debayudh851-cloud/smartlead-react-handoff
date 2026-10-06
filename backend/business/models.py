@@ -17,6 +17,16 @@ class Profile(models.Model):
     phone = models.CharField(max_length=30, blank=True)
 
 
+class AdminRegistration(Timestamped):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='admin_registration')
+    status = models.CharField(max_length=10, choices=[('PENDING', 'Pending'), ('APPROVED', 'Approved'), ('REJECTED', 'Rejected')], default='PENDING')
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='reviewed_admin_registrations')
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta(Timestamped.Meta):
+        constraints = [models.CheckConstraint(condition=models.Q(status__in=['PENDING', 'APPROVED', 'REJECTED']), name='admin_registration_valid_status')]
+
+
 class Category(Timestamped):
     name = models.CharField(max_length=120, unique=True)
     slug = models.SlugField(unique=True)

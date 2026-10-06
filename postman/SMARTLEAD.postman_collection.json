@@ -413,6 +413,45 @@
           ]
         },
         {
+          "name": "POST /api/admin/login/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/admin/login/",
+            "description": "Takes a set of user credentials and returns an access and refresh JSON web\ntoken pair to prove the authentication of those credentials.\nSee docs/API_CONTRACT.md for roles, filters and error expectations.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Response is not a server error\", function () { pm.expect(pm.response.code).to.be.below(500); });",
+                  "if (pm.response.code === 200) { const data = pm.response.json(); pm.environment.set(\"access\", data.access); pm.environment.set(\"refresh\", data.refresh); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "GET /api/admin/packages/",
           "request": {
             "method": "GET",
@@ -625,6 +664,44 @@
                   "type": "string"
                 }
               ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Response is not a server error\", function () { pm.expect(pm.response.code).to.be.below(500); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /api/admin/register/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/admin/register/",
+            "description": "\nSee docs/API_CONTRACT.md for roles, filters and error expectations.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": [],
@@ -2725,6 +2802,126 @@
       ]
     },
     {
+      "name": "superuser",
+      "item": [
+        {
+          "name": "GET /api/superuser/admin-registrations/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/superuser/admin-registrations/",
+            "description": "\nSee docs/API_CONTRACT.md for roles, filters and error expectations.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Response is not a server error\", function () { pm.expect(pm.response.code).to.be.below(500); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /api/superuser/admin-registrations/{id}/decision/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/superuser/admin-registrations/{{id}}/decision/",
+            "description": "\nSee docs/API_CONTRACT.md for roles, filters and error expectations.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Response is not a server error\", function () { pm.expect(pm.response.code).to.be.below(500); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /api/superuser/login/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/superuser/login/",
+            "description": "Takes a set of user credentials and returns an access and refresh JSON web\ntoken pair to prove the authentication of those credentials.\nSee docs/API_CONTRACT.md for roles, filters and error expectations.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Response is not a server error\", function () { pm.expect(pm.response.code).to.be.below(500); });",
+                  "if (pm.response.code === 200) { const data = pm.response.json(); pm.environment.set(\"access\", data.access); pm.environment.set(\"refresh\", data.refresh); }"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "token",
       "item": [
         {
@@ -2880,6 +3077,45 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Response is not a server error\", function () { pm.expect(pm.response.code).to.be.below(500); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /api/user/login/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/user/login/",
+            "description": "Takes a set of user credentials and returns an access and refresh JSON web\ntoken pair to prove the authentication of those credentials.\nSee docs/API_CONTRACT.md for roles, filters and error expectations.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Response is not a server error\", function () { pm.expect(pm.response.code).to.be.below(500); });",
+                  "if (pm.response.code === 200) { const data = pm.response.json(); pm.environment.set(\"access\", data.access); pm.environment.set(\"refresh\", data.refresh); }"
                 ]
               }
             }
