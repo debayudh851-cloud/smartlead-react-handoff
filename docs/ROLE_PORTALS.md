@@ -34,3 +34,10 @@ Tables are created by versioned Django migrations; the superuser portal manages 
 - `GET /api/leads/` and existing lead operations require an active admin or superuser. Ordinary users use `/api/enquiries/` to see their own requirements.
 
 Legacy generic JWT login remains for compatibility; it does not bypass protected API permissions. New React screens should use the role-specific login methods in `react-handoff/client.ts`.
+
+
+## Fictional local demonstration
+
+With DEBUG=True, run `python manage.py seed_demo` from backend. It adds ordinary demo accounts, a pending admin application, five fictional requirements across lead statuses, a follow-up, wishlist, approved sample review and scores from the actual demonstration model. Re-running leaves existing sample records unchanged. New random passwords are saved only in ignored `backend/LOCAL_ACCESS.txt`; do not publish this file.
+
+For a local demonstration where you explicitly want privileged test accounts, run `python manage.py seed_demo --with-privileged-accounts`. This additionally creates demo_admin and demo_superuser with random local credentials. Default seeding creates no privileged accounts. The sample records are prefixed [DEMO] and emails use example.com.

@@ -68,3 +68,10 @@ Use a supported production WSGI/ASGI server, TLS, DEBUG=false, exact hosts/origi
 ## User, admin and superuser portals
 
 Separate interfaces are available at `/user/`, `/admin-portal/` and `/superuser/`. Admin registration requires superuser approval before requirement access. See [ROLE_PORTALS.md](ROLE_PORTALS.md) for PostgreSQL relationships, registration, role-specific login and API endpoints. Apply migrations when updating an existing installation.
+
+
+## Fictional local demonstration
+
+With DEBUG=True, run `python manage.py seed_demo` from backend. It adds ordinary demo accounts, a pending admin application, five fictional requirements across lead statuses, a follow-up, wishlist, approved sample review and scores from the actual demonstration model. Re-running leaves existing sample records unchanged. New random passwords are saved only in ignored `backend/LOCAL_ACCESS.txt`; do not publish this file.
+
+For a local demonstration where you explicitly want privileged test accounts, run `python manage.py seed_demo --with-privileged-accounts`. This additionally creates demo_admin and demo_superuser with random local credentials. Default seeding creates no privileged accounts. The sample records are prefixed [DEMO] and emails use example.com.

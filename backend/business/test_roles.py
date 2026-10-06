@@ -1,4 +1,8 @@
 import secrets
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from django.core.management import call_command
+from django.test import override_settings
 from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase
 from .models import AdminRegistration, Category, Service, Enquiry, Lead
@@ -71,3 +75,15 @@ class RolePortalTests(APITestCase):
         user = User.objects.get(username='newuser')
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
+
+    def test_demo_seed_is_repeatable_and_keeps_credentials_local(self):
+        with TemporaryDirectory() as directory, override_settings(DEBUG=True, BASE_DIR=Path(directory)):
+            call_command('seed_demo')
+            access_file = Path(directory) / 'LOCAL_ACCESS.txt'
+            original = access_file.read_text(encoding='utf-8')
+            call_command('seed_demo')
+            self.assertEqual(access_file.read_text(encoding='utf-8'), original)
+            self.assertEqual(Enquiry.objects.filter(user__username='demo_user').count(), 5)
+            self.assertFalse(User.objects.filter(username__in=['demo_admin', 'demo_superuser']).exists())
+            self.assertFalse(User.objects.get(username='demo_pending_admin').is_staff)
+            self.assertEqual(Lead.objects.filter(enquiry__user__username='demo_user', status='CONVERTED').count(), 1)
