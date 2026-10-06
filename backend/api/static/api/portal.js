@@ -5,7 +5,7 @@ function show(panel) {
   document.querySelectorAll('.panel').forEach(el => el.hidden = el.id !== panel);
   document.querySelectorAll('[data-panel]').forEach(el => el.setAttribute('aria-pressed', String(el.dataset.panel === panel)));
 }
-function updateSession() { document.querySelector('#session-status').textContent = tokens ? 'Signed in · session held in this page' : 'Signed out'; }
+function updateSession() { document.querySelector('#logout').hidden=!tokens; document.querySelector('#refresh').hidden=!tokens; document.querySelector('#session-status').textContent = tokens ? 'Signed in · session held in this page' : 'Signed out'; }
 function clearSession() { tokens = null; updateSession(); document.querySelector('#users-body').replaceChildren(); }
 function report(data) { result.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2); }
 async function request(endpoint, data, auth = false) {
