@@ -41,3 +41,6 @@ Legacy generic JWT login remains for compatibility; it does not bypass protected
 With DEBUG=True, run `python manage.py seed_demo` from backend. It adds ordinary demo accounts, a pending admin application, five fictional requirements across lead statuses, a follow-up, wishlist, approved sample review and scores from the actual demonstration model. Re-running leaves existing sample records unchanged. New random passwords are saved only in ignored `backend/LOCAL_ACCESS.txt`; do not publish this file.
 
 For a local demonstration where you explicitly want privileged test accounts, run `python manage.py seed_demo --with-privileged-accounts`. This additionally creates demo_admin and demo_superuser with random local credentials. Default seeding creates no privileged accounts. The sample records are prefixed [DEMO] and emails use example.com.
+
+
+Signup and login are separate pages. User signup: `/user/signup/`; user login: `/user/`. Admin signup: `/admin-portal/signup/`; admin login: `/admin-portal/`. Login pages link to Sign up; signup pages link back to Log in. Superusers have login only. Signup confirms passwords and displays the registration result without automatically signing in.

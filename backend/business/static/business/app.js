@@ -43,10 +43,6 @@ run(async()=>{const p=await api('/api/categories/');rows(p).forEach(c=>{const o=
 
 // Each interface has its own role-specific login; API permissions also enforce access.
 if(portalRole!=='user') { $('catalog').hidden=true; $('customer').hidden=true; $('staff').hidden=portalRole!=='admin'; }
-if($('role-register')) bind('role-register',async(body,form)=>{
-  const result=await api(portalRole==='admin'?'/api/admin/register/':'/api/user/register/','POST',body);
-  form.reset(); feedback(result.message + (portalRole==='user'?' Sign in above to continue.':''));
-});
 let nextAccounts=null,nextRegistrations=null;
 async function loadAccounts(url='/api/admin/accounts/') {
   requireLogin(); const p=await api(url);nextAccounts=p.next;$('more-accounts').hidden=!nextAccounts;

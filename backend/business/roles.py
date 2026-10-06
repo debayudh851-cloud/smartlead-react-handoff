@@ -19,6 +19,10 @@ def portal(request, role):
     return render(request, 'business/home.html', {'portal_role': role, 'portal_title': {'user': 'User', 'admin': 'Admin', 'superuser': 'Superuser'}[role]})
 
 
+def signup(request, role):
+    return render(request, 'business/signup.html', {'portal_role': role, 'portal_title': 'Admin' if role == 'admin' else 'User', 'login_url': '/admin-portal/' if role == 'admin' else '/user/'})
+
+
 class RoleLoginSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         tokens = super().validate(attrs)

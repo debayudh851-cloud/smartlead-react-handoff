@@ -22,9 +22,11 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from django.conf import settings
 from django.conf.urls.static import static
 from api.views import user_register
-from business.roles import portal, RoleLoginView, AdminRegisterView, AdminRegistrationList, AdminDecisionView
+from business.roles import portal, signup, RoleLoginView, AdminRegisterView, AdminRegistrationList, AdminDecisionView
 
 urlpatterns = [
+    path('user/signup/', signup, {'role': 'user'}, name='user-signup'),
+    path('admin-portal/signup/', signup, {'role': 'admin'}, name='admin-signup'),
     path('user/', portal, {'role': 'user'}, name='user-portal'),
     path('admin-portal/', portal, {'role': 'admin'}, name='admin-portal'),
     path('superuser/', portal, {'role': 'superuser'}, name='superuser-portal'),
