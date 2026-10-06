@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/api/admin/users/"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{admin_access}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("HTTP 200", () => pm.response.to.have.status(200));
+      if (pm.response.code === 200) { const d = pm.response.json(); pm.test("List contract", () => pm.expect(d.count).to.eql(d.users.length)); }
+    language: text/javascript
+order: 4000

@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{base_url}}/api/token/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "{{admin_username}}",
+      "password": "{{admin_password}}"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("HTTP 200", () => pm.response.to.have.status(200));
+      if (pm.response.code === 200) { const d = pm.response.json(); pm.environment.set("admin_access", d.access); pm.environment.set("admin_refresh", d.refresh); }
+    language: text/javascript
+order: 3000

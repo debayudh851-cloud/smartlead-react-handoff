@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{base_url}}/api/token/refresh/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "refresh": "{{admin_refresh}}"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("HTTP 200", () => pm.response.to.have.status(200));
+      if (pm.response.code === 200) pm.environment.set("admin_access", pm.response.json().access);
+    language: text/javascript
+order: 7000

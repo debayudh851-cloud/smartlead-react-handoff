@@ -1,0 +1,2 @@
+$kind: collection
+description: Run registration/login/list tests first. Pause before reset to copy UID and token from Django console email. Use a fresh username/email for each complete run.

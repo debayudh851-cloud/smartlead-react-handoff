@@ -1,0 +1,11 @@
+from rest_framework.permissions import BasePermission, SAFE_METHODS
+
+
+class SuperAdminOnly(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated and request.user.is_active and request.user.is_superuser)
+
+
+class PublicReadStaffWrite(BasePermission):
+    def has_permission(self, request, view):
+        return request.method in SAFE_METHODS or bool(request.user.is_authenticated and request.user.is_staff and request.user.is_active)

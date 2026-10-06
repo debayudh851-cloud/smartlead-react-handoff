@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{base_url}}/api/admin/users/"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{user_access}}"
+scripts:
+  - type: afterResponse
+    code: pm.test("HTTP 403", () => pm.response.to.have.status(403));
+    language: text/javascript
+order: 6000

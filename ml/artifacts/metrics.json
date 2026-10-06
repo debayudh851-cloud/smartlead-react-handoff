@@ -1,0 +1,37 @@
+{
+  "model_version": "xeducation-logreg-v1-1426dffd9424",
+  "algorithm": "LogisticRegression",
+  "source": "https://www.kaggle.com/datasets/lakshmikalyan/lead-scoring-x-online-education",
+  "dataset_sha256": "1426dffd94246b8c7f08d1080d9c04115a0c4b67eadcba1ed9d2fa10d3762802",
+  "training_rows": 7392,
+  "test_rows": 1848,
+  "random_state": 42,
+  "features": [
+    "TotalVisits",
+    "Total Time Spent on Website",
+    "Page Views Per Visit",
+    "Lead Source"
+  ],
+  "roc_auc": 0.8000295487814528,
+  "average_precision": 0.716241706920474,
+  "brier_score": 0.17183360417784097,
+  "accuracy_at_0_5": 0.7575757575757576,
+  "confusion_matrix_at_0_5": [
+    [
+      979,
+      157
+    ],
+    [
+      291,
+      421
+    ]
+  ],
+  "is_demo": true,
+  "limitations": [
+    "Education-domain data; not validated on digital-service leads.",
+    "Random holdout, not temporal validation: dataset has no usable event timestamp.",
+    "Only source and website engagement features used; budgets, services and previous enquiries are not invented.",
+    "Dataset capture timing is not proven: prospective leakage must be reassessed on real deployment data.",
+    "HIGH/MEDIUM/LOW thresholds are configurable demonstration defaults, not business-approved calibration."
+  ]
+}

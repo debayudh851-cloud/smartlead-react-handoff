@@ -1,0 +1,17 @@
+backend/.env
+backend/my_venv/
+backend/.venv/
+backend/*.sqlite3
+**/__pycache__/
+**/*.py[cod]
+data/raw/
+backend/media/
+backend/staticfiles/
+**/.env
+**/.venv/
+**/my_venv/
+**/*.sqlite3
+**/LOCAL_ACCESS.txt
+output/
+.publish/
+backend/data/

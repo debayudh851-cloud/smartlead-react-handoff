@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{base_url}}/api/user/register/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "{{user_username}}",
+      "email": "{{user_email}}",
+      "password": "{{user_password}}"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: pm.test("HTTP 400", () => pm.response.to.have.status(400));
+    language: text/javascript
+order: 2000

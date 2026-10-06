@@ -1,0 +1,8 @@
+.venv/
+.env
+*.sqlite3
+__pycache__/
+*.py[cod]
+.pytest_cache/
+LOCAL_ADMIN.md
+postman/*.local.json
