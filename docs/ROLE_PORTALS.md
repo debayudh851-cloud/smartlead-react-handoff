@@ -34,3 +34,8 @@ The legacy admin registration table is retained for history; its public routes a
 ## Local demo
 
 With DEBUG=True, `python manage.py seed_demo` adds fictional ordinary-user requirements, follow-ups, reviews and model scores. It creates no employee privileges by default. New local credentials are saved only to ignored `backend/LOCAL_ACCESS.txt`. No credentials are shipped in GitHub or the ZIP.
+
+
+## Private API documentation
+
+The public header shows Only for admins, linking to `/superuser/`. API docs are available only after superuser login. Both `/api/docs/` and `/api/schema/` enforce superuser authorization, including direct URL requests. The superuser portal loads the schema with the in-memory JWT and renders endpoint/model documentation.

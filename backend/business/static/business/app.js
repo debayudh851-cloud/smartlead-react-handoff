@@ -3,7 +3,7 @@
 let access = '', refresh = '', nextServices = null, nextLeads = null, mustChangePassword=false;
 const portalRole=document.body.dataset.role || 'user';
 const $ = id => document.getElementById(id);
-function syncSignOut(){ $('logout').hidden=!access; $('session').hidden=!access; }
+function syncSignOut(){ $('logout').hidden=!access; $('session').hidden=!access;if($('open-api-docs')){$('open-api-docs').hidden=!access;if(!access){$('api-documentation').hidden=true;$('api-endpoints').replaceChildren();}} }
 const feedback = (message, error=false) => { $('feedback').textContent=message; $('feedback').classList.toggle('error',error); };
 async function api(url, method='GET', body=null, retried=false, extra={}) {
   const headers={...extra}; if(access) headers.Authorization=`Bearer ${access}`;
@@ -65,3 +65,13 @@ if($('employee-password')) bind('employee-password',async(body,form)=>{await api
 if($('account-filter')) {bind('account-filter',body=>loadAccounts('/api/admin/accounts/?'+new URLSearchParams(body)));$('more-accounts').onclick=()=>run(()=>loadAccounts(nextAccounts));$('load-registrations').onclick=()=>run(()=>loadRegistrations());$('more-registrations').onclick=()=>run(()=>loadRegistrations(nextRegistrations));}
 
 if(portalRole!=='user') feedback('Sign in to load your workspace.');
+
+if($('open-api-docs')) $('open-api-docs').onclick=()=>run(async()=>{
+  requireLogin();const schema=await api('/api/schema/?format=json');const box=$('api-endpoints');box.replaceChildren();
+  for(const [path,operations] of Object.entries(schema.paths)) for(const [method,operation] of Object.entries(operations)) {
+    if(!['get','post','put','patch','delete'].includes(method))continue;
+    const details=el('details',undefined,'card');details.append(el('summary',`${method.toUpperCase()} ${path}`),el('p',operation.description||operation.summary||''),el('pre',JSON.stringify(operation,null,2)));box.append(details);
+  }
+  const components=el('details',undefined,'card');components.append(el('summary','Request and response models'),el('pre',JSON.stringify(schema.components,null,2)));box.append(components);
+  $('api-documentation').hidden=false;$('api-documentation').scrollIntoView({behavior:'smooth'});
+});

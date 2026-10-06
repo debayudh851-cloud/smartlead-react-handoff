@@ -24,6 +24,7 @@ from django.conf.urls.static import static
 from api.views import user_register
 from business.roles import portal, signup, RoleLoginView
 from business.employees import EmployeeCreateView, RecoverySubmitView, RecoveryListView, RecoveryDecisionView
+from business.permissions import SuperAdminOnly
 
 urlpatterns = [
     path('api/superuser/employees/', EmployeeCreateView.as_view()),
@@ -46,8 +47,8 @@ urlpatterns = [
     path('api/auth/register/', user_register),
     path('api/auth/login/', TokenObtainPairView.as_view()),
     path('api/auth/refresh/', TokenRefreshView.as_view()),
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/', SpectacularAPIView.as_view(permission_classes=[SuperAdminOnly]), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema', permission_classes=[SuperAdminOnly]), name='swagger-ui'),
     path('api/', include('business.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

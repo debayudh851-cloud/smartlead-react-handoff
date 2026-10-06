@@ -11,6 +11,16 @@ User = get_user_model()
 
 
 class RolePortalTests(APITestCase):
+    def test_public_navigation_and_private_documentation(self):
+        page = self.client.get('/user/')
+        self.assertContains(page, 'Only for admins')
+        self.assertNotContains(page, 'API docs')
+        self.assertNotContains(page, '>Admin portal</a>')
+        for user, expected in [(None, 401), (self.user, 403), (self.admin, 403), (self.root, 200)]:
+            self.client.force_authenticate(user)
+            for path in ['/api/docs/', '/api/schema/?format=json']:
+                self.assertEqual(self.client.get(path).status_code, expected)
+
     def setUp(self):
         self.password = secrets.token_urlsafe(24)
         self.user = User.objects.create_user('user', 'user@example.com', self.password)

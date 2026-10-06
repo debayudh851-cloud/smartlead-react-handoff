@@ -1772,7 +1772,6 @@ paths:
       - schema
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
