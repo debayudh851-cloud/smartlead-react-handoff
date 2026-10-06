@@ -171,6 +171,11 @@ class NotificationSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField()
+    must_change_password = serializers.SerializerMethodField()
+
+    def get_must_change_password(self, obj) -> bool:
+        from .models import EmployeeAccess
+        return obj.is_staff and not obj.is_superuser and EmployeeAccess.objects.filter(user=obj, must_change_password=True).exists()
     phone = serializers.CharField(max_length=30, required=False, allow_blank=True)
 
     def get_role(self, obj) -> str:
@@ -178,7 +183,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 'role']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 'role', 'must_change_password']
         read_only_fields = ['id', 'username', 'email']
 
     def to_representation(self, obj):
@@ -206,6 +211,8 @@ class PasswordChangeSerializer(serializers.Serializer):
             raise serializers.ValidationError({'current_password': 'Incorrect password.'})
         if data['new_password'] != data['confirm_password']:
             raise serializers.ValidationError({'confirm_password': 'Passwords do not match.'})
+        if user.check_password(data['new_password']):
+            raise serializers.ValidationError({'new_password': 'Choose a different password.'})
         try:
             validate_password(data['new_password'], user)
         except ValidationError as exc:

@@ -22,23 +22,25 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from django.conf import settings
 from django.conf.urls.static import static
 from api.views import user_register
-from business.roles import portal, signup, RoleLoginView, AdminRegisterView, AdminRegistrationList, AdminDecisionView
+from business.roles import portal, signup, RoleLoginView
+from business.employees import EmployeeCreateView, RecoverySubmitView, RecoveryListView, RecoveryDecisionView
 
 urlpatterns = [
+    path('api/superuser/employees/', EmployeeCreateView.as_view()),
+    path('api/admin/recovery-request/', RecoverySubmitView.as_view()),
+    path('api/admin/forgot-password/', RecoverySubmitView.as_view()),
+    path('api/superuser/recovery-requests/', RecoveryListView.as_view()),
+    path('api/superuser/recovery-requests/<int:pk>/decision/', RecoveryDecisionView.as_view()),
     path('user/signup/', signup, {'role': 'user'}, name='user-signup'),
-    path('admin-portal/signup/', signup, {'role': 'admin'}, name='admin-signup'),
     path('user/', portal, {'role': 'user'}, name='user-portal'),
     path('admin-portal/', portal, {'role': 'admin'}, name='admin-portal'),
     path('superuser/', portal, {'role': 'superuser'}, name='superuser-portal'),
     path('api/user/login/', RoleLoginView.as_view(portal_role='user')),
     path('api/admin/login/', RoleLoginView.as_view(portal_role='admin')),
     path('api/superuser/login/', RoleLoginView.as_view(portal_role='superuser')),
-    path('api/admin/register/', AdminRegisterView.as_view()),
-    path('api/superuser/admin-registrations/', AdminRegistrationList.as_view()),
-    path('api/superuser/admin-registrations/<int:pk>/decision/', AdminDecisionView.as_view()),
     path('', TemplateView.as_view(template_name='business/home.html'), name='home'),
     path('accounts/', TemplateView.as_view(template_name='api/index.html'), name='accounts'),
-    path('<str:role>/reset-password/<str:uid>/<str:token>/', TemplateView.as_view(template_name='api/index.html'), name='reset-page'),
+    path('user/reset-password/<str:uid>/<str:token>/', TemplateView.as_view(template_name='api/index.html'), name='reset-page'),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     path('api/auth/register/', user_register),

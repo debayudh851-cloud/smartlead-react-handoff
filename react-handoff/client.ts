@@ -11,16 +11,16 @@ export class SmartLeadClient {
     this.tokens = await this.request<Tokens>(`${portal}/login/`, 'POST', { username, password });
     return this.request('auth/profile/');
   }
-  register(username: string, email: string, password: string, portal: 'user' | 'admin' = 'user') {
-    return this.request(`${portal}/register/`, 'POST', { username, email, password });
+  register(username: string, email: string, password: string) {
+    return this.request('user/register/', 'POST', { username, email, password });
   }
   accounts(role: '' | 'user' | 'admin' | 'superuser' = '') {
     return this.request(`admin/accounts/?role=${role}`);
   }
-  adminRegistrations() { return this.request('superuser/admin-registrations/'); }
-  decideAdmin(id: number, status: 'APPROVED' | 'REJECTED') {
-    return this.request(`superuser/admin-registrations/${id}/decision/`, 'POST', { status });
-  }
+  createEmployee(username: string, email: string) { return this.request('superuser/employees/', 'POST', {username, email}); }
+  requestAdminRecovery(email: string, reason = '') { return this.request('admin/recovery-request/', 'POST', {email, reason}); }
+  recoveryRequests() { return this.request('superuser/recovery-requests/'); }
+  decideRecovery(id: number, decision: 'RESET' | 'REJECT') { return this.request(`superuser/recovery-requests/${id}/decision/`, 'POST', {decision}); }
   async logout() {
     try { if (this.tokens) await this.request('auth/logout/', 'POST', { refresh: this.tokens.refresh }); }
     finally { this.tokens = null; }

@@ -680,7 +680,7 @@
           ]
         },
         {
-          "name": "POST /api/admin/register/",
+          "name": "POST /api/admin/recovery-request/",
           "request": {
             "method": "POST",
             "header": [
@@ -689,52 +689,14 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/api/admin/register/",
+            "url": "{{base_url}}/api/admin/recovery-request/",
             "description": "\nSee docs/API_CONTRACT.md for roles, filters and error expectations.",
             "auth": {
               "type": "noauth"
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"{{username}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Response is not a server error\", function () { pm.expect(pm.response.code).to.be.below(500); });"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "POST /api/admin/reset-password/",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{base_url}}/api/admin/reset-password/",
-            "description": "\nSee docs/API_CONTRACT.md for roles, filters and error expectations.",
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"uid\": \"{{uid}}\",\n  \"token\": \"{{token}}\",\n  \"new_password\": \"{{new_password}}\",\n  \"confirm_password\": \"{{confirm_password}}\"\n}",
+              "raw": "{\n  \"email\": \"{{email}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2805,38 +2767,7 @@
       "name": "superuser",
       "item": [
         {
-          "name": "GET /api/superuser/admin-registrations/",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{base_url}}/api/superuser/admin-registrations/",
-            "description": "\nSee docs/API_CONTRACT.md for roles, filters and error expectations.",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{access}}",
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Response is not a server error\", function () { pm.expect(pm.response.code).to.be.below(500); });"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "POST /api/superuser/admin-registrations/{id}/decision/",
+          "name": "POST /api/superuser/employees/",
           "request": {
             "method": "POST",
             "header": [
@@ -2845,7 +2776,7 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/api/superuser/admin-registrations/{{id}}/decision/",
+            "url": "{{base_url}}/api/superuser/employees/",
             "description": "\nSee docs/API_CONTRACT.md for roles, filters and error expectations.",
             "auth": {
               "type": "bearer",
@@ -2859,7 +2790,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"status\": \"APPROVED\"\n}",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"email\": \"{{email}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2914,6 +2845,82 @@
                 "exec": [
                   "pm.test(\"Response is not a server error\", function () { pm.expect(pm.response.code).to.be.below(500); });",
                   "if (pm.response.code === 200) { const data = pm.response.json(); pm.environment.set(\"access\", data.access); pm.environment.set(\"refresh\", data.refresh); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/superuser/recovery-requests/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/api/superuser/recovery-requests/",
+            "description": "\nSee docs/API_CONTRACT.md for roles, filters and error expectations.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Response is not a server error\", function () { pm.expect(pm.response.code).to.be.below(500); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /api/superuser/recovery-requests/{id}/decision/",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/superuser/recovery-requests/{{id}}/decision/",
+            "description": "\nSee docs/API_CONTRACT.md for roles, filters and error expectations.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"RESET\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Response is not a server error\", function () { pm.expect(pm.response.code).to.be.below(500); });"
                 ]
               }
             }

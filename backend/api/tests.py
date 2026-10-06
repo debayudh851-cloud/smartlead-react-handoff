@@ -63,40 +63,12 @@ class BackendTests(APITestCase):
         self.assertEqual(self.post('/api/token/', dict(username='admin', password='wrong')).status_code, 401)
         self.assertEqual(self.post('/api/token/refresh/', dict(refresh='invalid')).status_code, 401)
 
-    def test_forgot_password(self):
-        responses = [self.post('/api/admin/forgot-password/', dict(email=email)) for email in ['ADMIN@example.com', 'missing@example.com', 'member@example.com']]
-        self.assertTrue(all(r.status_code == 200 for r in responses))
+    def test_retired_admin_reset_and_request_alias(self):
+        self.assertEqual(self.post('/api/admin/reset-password/', self.reset_data()).status_code, 404)
+        responses = [self.post('/api/admin/forgot-password/', {'email': email}) for email in ['admin@example.com', 'missing@example.com']]
+        self.assertTrue(all(response.status_code == 200 for response in responses))
         self.assertEqual(responses[0].data, responses[1].data)
-        self.assertEqual(responses[1].data, responses[2].data)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn(settings.FRONTEND_URL + '/admin/reset-password/', mail.outbox[0].body)
-        self.assertEqual(self.post('/api/admin/forgot-password/', dict(email='bad')).status_code, 400)
-
-    def test_reset_revokes_tokens(self):
-        refresh = RefreshToken.for_user(self.admin)
-        access = str(refresh.access_token)
-        data = self.reset_data()
-        self.assertEqual(self.post('/api/admin/reset-password/', data).status_code, 200)
-        self.assertEqual(self.post('/api/admin/reset-password/', data).status_code, 400)
-        self.assertEqual(self.post('/api/token/', dict(username='admin', password=PASSWORD)).status_code, 401)
-        self.assertEqual(self.post('/api/token/', dict(username='admin', password=NEW)).status_code, 200)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access}')
-        self.assertEqual(self.client.get('/api/admin/users/').status_code, 401)
-        self.client.credentials()
-        self.assertEqual(self.post('/api/token/refresh/', dict(refresh=str(refresh))).status_code, 401)
-
-    def test_invalid_reset(self):
-        for changes in [dict(uid='!!!!'), dict(uid='OTk5OTk5'), dict(token='invalid'), dict(confirm_password='different'), dict(new_password='12345678', confirm_password='12345678')]:
-            data = self.reset_data()
-            data.update(changes)
-            with self.subTest(changes=changes):
-                self.assertEqual(self.post('/api/admin/reset-password/', data).status_code, 400)
-        self.assertEqual(self.post('/api/admin/reset-password/', self.reset_data(self.user)).status_code, 400)
-
-    def test_reset_expiry(self):
-        data = self.reset_data()
-        with patch.object(generator, '_now', return_value=generator._now() + timedelta(hours=2)):
-            self.assertEqual(self.post('/api/admin/reset-password/', data).status_code, 400)
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_expired_jwts(self):
         refresh = RefreshToken.for_user(self.admin)
@@ -197,13 +169,13 @@ class BackendTests(APITestCase):
         for password in ['OnlyLettersHere', '1234567890', 'Ab1!x', '!!!!!!!!']:
             with self.subTest(password=password):
                 self.assertEqual(self.post('/api/user/register/', dict(username='fresh', email='fresh@example.com', password=password)).status_code, 400)
-                for user, role in [(self.user, 'user'), (self.admin, 'admin')]:
+                for user, role in [(self.user, 'user')]:
                     data = self.reset_data(user)
                     data.update(new_password=password, confirm_password=password)
                     self.assertEqual(self.post(f'/api/{role}/reset-password/', data).status_code, 400)
 
     def test_reset_current_password_rejected_without_consuming_token(self):
-        for user, role in [(self.user, 'user'), (self.admin, 'admin')]:
+        for user, role in [(self.user, 'user')]:
             data = self.reset_data(user)
             data.update(new_password=PASSWORD, confirm_password=PASSWORD)
             response = self.post(f'/api/{role}/reset-password/', data)
@@ -215,7 +187,7 @@ class BackendTests(APITestCase):
             self.assertEqual(self.post(f'/api/{role}/reset-password/', data).status_code, 200)
 
     def test_reset_required_fields(self):
-        for user, role in [(self.user, 'user'), (self.admin, 'admin')]:
+        for user, role in [(self.user, 'user')]:
             valid = self.reset_data(user)
             for field in valid:
                 for value in ['', '   ', None]:

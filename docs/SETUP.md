@@ -64,17 +64,6 @@ The test database role needs permission to create/drop the temporary PostgreSQL 
 
 Use a supported production WSGI/ASGI server, TLS, DEBUG=false, exact hosts/origins, secure cookies, SMTP, persistent media storage, backups and a shared throttle cache. Configure reminder scheduling and protect staff accounts. Swagger UI uses CDN assets and may require network access. No cloud deployment has been performed.
 
+## Employee admin access
 
-## User, admin and superuser portals
-
-Separate interfaces are available at `/user/`, `/admin-portal/` and `/superuser/`. Admin registration requires superuser approval before requirement access. See [ROLE_PORTALS.md](ROLE_PORTALS.md) for PostgreSQL relationships, registration, role-specific login and API endpoints. Apply migrations when updating an existing installation.
-
-
-## Fictional local demonstration
-
-With DEBUG=True, run `python manage.py seed_demo` from backend. It adds ordinary demo accounts, a pending admin application, five fictional requirements across lead statuses, a follow-up, wishlist, approved sample review and scores from the actual demonstration model. Re-running leaves existing sample records unchanged. New random passwords are saved only in ignored `backend/LOCAL_ACCESS.txt`; do not publish this file.
-
-For a local demonstration where you explicitly want privileged test accounts, run `python manage.py seed_demo --with-privileged-accounts`. This additionally creates demo_admin and demo_superuser with random local credentials. Default seeding creates no privileged accounts. The sample records are prefixed [DEMO] and emails use example.com.
-
-
-Signup and login are separate pages. User signup: `/user/signup/`; user login: `/user/`. Admin signup: `/admin-portal/signup/`; admin login: `/admin-portal/`. Login pages link to Sign up; signup pages link back to Log in. Superusers have login only. Signup confirms passwords and displays the registration result without automatically signing in.
+Only users can sign up. Company admin accounts and credential recovery are managed by the superuser, with temporary passwords that must be replaced before requirement access. See `docs/ROLE_PORTALS.md` (or `ROLE_PORTALS.md` from this docs folder) for the current API and PostgreSQL relationships. Public admin signup, token-based admin reset and old admin-registration approval routes have been retired. Apply migrations before running this version.

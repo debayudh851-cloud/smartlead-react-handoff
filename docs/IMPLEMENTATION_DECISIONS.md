@@ -21,7 +21,6 @@ These decisions make version 1 concrete. They can be revised with reviewed migra
 
 Deployment still requires approved origins, SMTP, TLS hosting, media storage, database backup/least-privilege roles, reminder scheduling, and real-domain model evaluation. This version is a working development handoff, not a deployed production service.
 
+## Employee admin access
 
-## User, admin and superuser portals
-
-Separate interfaces are available at `/user/`, `/admin-portal/` and `/superuser/`. Admin registration requires superuser approval before requirement access. See [ROLE_PORTALS.md](ROLE_PORTALS.md) for PostgreSQL relationships, registration, role-specific login and API endpoints. Apply migrations when updating an existing installation.
+Only users can sign up. Company admin accounts and credential recovery are managed by the superuser, with temporary passwords that must be replaced before requirement access. See `docs/ROLE_PORTALS.md` (or `ROLE_PORTALS.md` from this docs folder) for the current API and PostgreSQL relationships. Public admin signup, token-based admin reset and old admin-registration approval routes have been retired. Apply migrations before running this version.

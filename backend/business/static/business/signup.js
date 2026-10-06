@@ -9,7 +9,7 @@ form.addEventListener('submit',async event=>{
   delete body.confirm_password;
   const submit=form.querySelector('button');submit.disabled=true;
   try {
-    const response=await fetch(`/api/${document.body.dataset.role}/register/`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const response=await fetch('/api/user/register/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const result=await response.json();
     if(!response.ok) throw new Error(Object.entries(result).map(([field,value])=>`${field}: ${Array.isArray(value)?value.join(' '):value}`).join('\n'));
     form.reset();form.hidden=true;

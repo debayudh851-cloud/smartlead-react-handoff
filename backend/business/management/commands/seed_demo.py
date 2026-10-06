@@ -8,7 +8,7 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils import timezone
-from business.models import AdminRegistration, Enquiry, LeadFollowUp, Review, Service, Wishlist
+from business.models import EmployeeAccess, Enquiry, LeadFollowUp, Review, Service, Wishlist
 from business.operations import create_enquiry, update_lead
 from business.predictor import predict
 
@@ -26,7 +26,7 @@ class Command(BaseCommand):
         credentials = []
         with transaction.atomic():
             accounts = {}
-            specifications = [('demo_user', False, False), ('demo_pending_admin', False, False)]
+            specifications = [('demo_user', False, False)]
             if options['with_privileged_accounts']:
                 specifications += [('demo_admin', True, False), ('demo_superuser', True, True)]
             for name, staff, root in specifications:
@@ -42,8 +42,7 @@ class Command(BaseCommand):
             user = accounts['demo_user']
             admin = accounts.get('demo_admin')
             if admin:
-                AdminRegistration.objects.get_or_create(user=admin, defaults={'status': 'APPROVED', 'reviewed_by': accounts['demo_superuser'], 'reviewed_at': timezone.now()})
-            AdminRegistration.objects.get_or_create(user=accounts['demo_pending_admin'])
+                EmployeeAccess.objects.get_or_create(user=admin, defaults={'must_change_password': True, 'provisioned_by': accounts['demo_superuser']})
             call_command('seed_services')
             cases = [
                 ('web-development', 'Build a responsive website for a fictional bakery with a menu and enquiry form.', '55000', 'NEW'),
@@ -74,5 +73,5 @@ class Command(BaseCommand):
                 output.write('\nLOCAL DEMO ACCESS — fictional records; never publish this file.\n')
                 output.write('\n'.join(credentials) + '\n')
                 output.write('User: /user/ | Admin: /admin-portal/ | Superuser: /superuser/\n')
-        self.stdout.write(self.style.SUCCESS('Demo ready: five requirements, a pending admin registration, follow-up, review, wishlist and actual demo model scores.'))
+        self.stdout.write(self.style.SUCCESS('Demo ready: five requirements, follow-up, review, wishlist and actual demo model scores.'))
         self.stdout.write(f'Local login details: {destination}')

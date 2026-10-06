@@ -17,6 +17,23 @@ class Profile(models.Model):
     phone = models.CharField(max_length=30, blank=True)
 
 
+class EmployeeAccess(Timestamped):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='employee_access')
+    must_change_password = models.BooleanField(default=True)
+    provisioned_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name='provisioned_employees')
+
+
+class AdminRecoveryRequest(Timestamped):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='admin_recovery_requests')
+    reason = models.CharField(max_length=1000, blank=True)
+    status = models.CharField(max_length=10, choices=[('PENDING', 'Pending'), ('RESOLVED', 'Resolved'), ('REJECTED', 'Rejected')], default='PENDING')
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name='reviewed_admin_recovery')
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta(Timestamped.Meta):
+        constraints = [models.UniqueConstraint(fields=['user'], condition=models.Q(status='PENDING'), name='one_pending_admin_recovery'), models.CheckConstraint(condition=models.Q(status__in=['PENDING', 'RESOLVED', 'REJECTED']), name='admin_recovery_valid_status')]
+
+
 class AdminRegistration(Timestamped):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='admin_registration')
     status = models.CharField(max_length=10, choices=[('PENDING', 'Pending'), ('APPROVED', 'Approved'), ('REJECTED', 'Rejected')], default='PENDING')

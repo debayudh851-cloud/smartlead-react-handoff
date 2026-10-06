@@ -12,7 +12,6 @@ The model is educational/demonstration-only; show is_demo and model_version wher
 
 Do not copy backend secrets into Vite environment variables. Client-visible environment values may contain API origin, never Django/PostgreSQL credentials.
 
+## Employee admin access
 
-## User, admin and superuser portals
-
-Separate interfaces are available at `/user/`, `/admin-portal/` and `/superuser/`. Admin registration requires superuser approval before requirement access. See `docs/ROLE_PORTALS.md` for PostgreSQL relationships, registration, role-specific login and API endpoints. Apply migrations when updating an existing installation.
+Only users can sign up. Company admin accounts and credential recovery are managed by the superuser, with temporary passwords that must be replaced before requirement access. See `docs/ROLE_PORTALS.md` (or `ROLE_PORTALS.md` from this docs folder) for the current API and PostgreSQL relationships. Public admin signup, token-based admin reset and old admin-registration approval routes have been retired. Apply migrations before running this version.

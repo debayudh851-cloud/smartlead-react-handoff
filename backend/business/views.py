@@ -289,11 +289,15 @@ class PasswordChangeView(generics.GenericAPIView):
     serializer_class = PasswordChangeSerializer
     permission_classes = [IsAuthenticated]
 
+    @transaction.atomic
     def post(self, request):
+        request.user = get_user_model().objects.select_for_update().get(pk=request.user.pk)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         request.user.set_password(serializer.validated_data['new_password'])
         request.user.save(update_fields=['password'])
+        from .models import EmployeeAccess
+        EmployeeAccess.objects.filter(user=request.user).update(must_change_password=False)
         return Response({'message': 'Password changed. Sign in again.'})
 
 

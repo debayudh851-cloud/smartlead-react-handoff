@@ -99,13 +99,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ForgotPasswordRequest'
+              $ref: '#/components/schemas/RecoverySubmitRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/ForgotPasswordRequest'
+              $ref: '#/components/schemas/RecoverySubmitRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/ForgotPasswordRequest'
+              $ref: '#/components/schemas/RecoverySubmitRequest'
         required: true
       security:
       - {}
@@ -114,7 +114,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageResponse'
+                $ref: '#/components/schemas/AdminRecoveryMessage'
           description: ''
   /api/admin/images/:
     get:
@@ -431,48 +431,22 @@ paths:
       responses:
         '204':
           description: No response body
-  /api/admin/register/:
+  /api/admin/recovery-request/:
     post:
-      operationId: admin_register_create
+      operationId: admin_recovery_request_create
       tags:
       - admin
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserRegistrationRequest'
+              $ref: '#/components/schemas/RecoverySubmitRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UserRegistrationRequest'
+              $ref: '#/components/schemas/RecoverySubmitRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UserRegistrationRequest'
-        required: true
-      security:
-      - {}
-      responses:
-        '201':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AdminRegistrationResponse'
-          description: ''
-  /api/admin/reset-password/:
-    post:
-      operationId: admin_reset_password_create
-      tags:
-      - admin
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ResetPasswordRequest'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/ResetPasswordRequest'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/ResetPasswordRequest'
+              $ref: '#/components/schemas/RecoverySubmitRequest'
         required: true
       security:
       - {}
@@ -481,7 +455,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MessageResponse'
+                $ref: '#/components/schemas/AdminRecoveryMessage'
           description: ''
   /api/admin/reviews/:
     get:
@@ -1998,58 +1972,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/Service'
           description: ''
-  /api/superuser/admin-registrations/:
-    get:
-      operationId: superuser_admin_registrations_list
-      parameters:
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      tags:
-      - superuser
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedAdminRegistrationList'
-          description: ''
-  /api/superuser/admin-registrations/{id}/decision/:
+  /api/superuser/employees/:
     post:
-      operationId: superuser_admin_registrations_decision_create
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        required: true
+      operationId: superuser_employees_create
       tags:
       - superuser
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AdminDecisionRequest'
+              $ref: '#/components/schemas/EmployeeCreateRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/AdminDecisionRequest'
+              $ref: '#/components/schemas/EmployeeCreateRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/AdminDecisionRequest'
+              $ref: '#/components/schemas/EmployeeCreateRequest'
         required: true
       security:
       - jwtAuth: []
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AdminRegistration'
+                $ref: '#/components/schemas/EmployeeCredentials'
           description: ''
   /api/superuser/login/:
     post:
@@ -2074,6 +2021,59 @@ paths:
       responses:
         '200':
           description: No response body
+  /api/superuser/recovery-requests/:
+    get:
+      operationId: superuser_recovery_requests_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - superuser
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRecoveryList'
+          description: ''
+  /api/superuser/recovery-requests/{id}/decision/:
+    post:
+      operationId: superuser_recovery_requests_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - superuser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecoveryDecisionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecoveryDecisionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RecoveryDecisionRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecoveryDecisionResponse'
+          description: ''
   /api/token/:
     post:
       operationId: token_create
@@ -2340,83 +2340,13 @@ paths:
           description: No response body
 components:
   schemas:
-    AdminDecisionRequest:
-      type: object
-      properties:
-        status:
-          $ref: '#/components/schemas/AdminDecisionStatusEnum'
-      required:
-      - status
-    AdminDecisionStatusEnum:
-      enum:
-      - APPROVED
-      - REJECTED
-      type: string
-      description: |-
-        * `APPROVED` - APPROVED
-        * `REJECTED` - REJECTED
-    AdminRegistration:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        user:
-          type: integer
-          readOnly: true
-        username:
-          type: string
-          readOnly: true
-        email:
-          type: string
-          format: email
-          readOnly: true
-        status:
-          allOf:
-          - $ref: '#/components/schemas/AdminRegistrationStatusEnum'
-          readOnly: true
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-        reviewed_by:
-          type: integer
-          readOnly: true
-          nullable: true
-        reviewed_at:
-          type: string
-          format: date-time
-          readOnly: true
-          nullable: true
-      required:
-      - created_at
-      - email
-      - id
-      - reviewed_at
-      - reviewed_by
-      - status
-      - user
-      - username
-    AdminRegistrationResponse:
+    AdminRecoveryMessage:
       type: object
       properties:
         message:
           type: string
-        registration_id:
-          type: integer
       required:
       - message
-      - registration_id
-    AdminRegistrationStatusEnum:
-      enum:
-      - PENDING
-      - APPROVED
-      - REJECTED
-      type: string
-      description: |-
-        * `PENDING` - Pending
-        * `APPROVED` - Approved
-        * `REJECTED` - Rejected
     AnalyticsSummary:
       type: object
       properties:
@@ -2517,6 +2447,48 @@ components:
       required:
       - name
       - slug
+    DecisionEnum:
+      enum:
+      - RESET
+      - REJECT
+      type: string
+      description: |-
+        * `RESET` - RESET
+        * `REJECT` - REJECT
+    EmployeeCreateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+      required:
+      - email
+      - username
+    EmployeeCredentials:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        temporary_password:
+          type: string
+        must_change_password:
+          type: boolean
+      required:
+      - id
+      - must_change_password
+      - temporary_password
+      - username
     Enquiry:
       type: object
       properties:
@@ -2924,29 +2896,6 @@ components:
       - name
       - price
       - service
-    PaginatedAdminRegistrationList:
-      type: object
-      required:
-      - count
-      - results
-      properties:
-        count:
-          type: integer
-          example: 123
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page=4
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page=2
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/AdminRegistration'
     PaginatedCategoryList:
       type: object
       required:
@@ -3154,6 +3103,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Prediction'
+    PaginatedRecoveryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recovery'
     PaginatedReviewList:
       type: object
       required:
@@ -3559,9 +3531,13 @@ components:
         role:
           type: string
           readOnly: true
+        must_change_password:
+          type: boolean
+          readOnly: true
       required:
       - email
       - id
+      - must_change_password
       - role
       - username
     ProfileRequest:
@@ -3576,6 +3552,92 @@ components:
         phone:
           type: string
           maxLength: 30
+    Recovery:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RecoveryStatusEnum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        reviewed_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - email
+      - id
+      - reason
+      - reviewed_at
+      - reviewed_by
+      - status
+      - user
+      - username
+    RecoveryDecisionRequest:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+      required:
+      - decision
+    RecoveryDecisionResponse:
+      type: object
+      properties:
+        credentials:
+          $ref: '#/components/schemas/EmployeeCredentials'
+        status:
+          type: string
+      required:
+      - credentials
+      - status
+    RecoveryStatusEnum:
+      enum:
+      - PENDING
+      - RESOLVED
+      - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `RESOLVED` - Resolved
+        * `REJECTED` - Rejected
+    RecoverySubmitRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        reason:
+          type: string
+          maxLength: 1000
+      required:
+      - email
     RegistrationResponse:
       type: object
       properties:

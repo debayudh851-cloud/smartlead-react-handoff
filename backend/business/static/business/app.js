@@ -1,6 +1,6 @@
 'use strict';
 // Tokens are held only in memory. A page reload requires a fresh sign-in.
-let access = '', refresh = '', nextServices = null, nextLeads = null;
+let access = '', refresh = '', nextServices = null, nextLeads = null, mustChangePassword=false;
 const portalRole=document.body.dataset.role || 'user';
 const $ = id => document.getElementById(id);
 const feedback = (message, error=false) => { $('feedback').textContent=message; $('feedback').classList.toggle('error',error); };
@@ -25,9 +25,9 @@ function bind(id,handler){$(id).addEventListener('submit',event=>{event.preventD
 function rows(payload){return payload.results||payload;}
 function list(id,items,render){$(id).replaceChildren();if(!items.length)$(id).append(el('p','No records yet.'));items.forEach(item=>$(id).append(render(item)));}
 function requireLogin(){if(!access)throw new Error('Please sign in first.');}
-document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{['catalog','customer','staff','supervision'].filter(id=>$(id)).forEach(id=>$(id).hidden=id!==b.dataset.tab);}));
-bind('login',async body=>{access='';refresh='';const tokens=await api(`/api/${portalRole}/login/`,'POST',body);access=tokens.access;refresh=tokens.refresh;const p=await api('/api/auth/profile/');$('session').textContent=`${p.username} · ${p.role}`;feedback('Signed in.');if(portalRole==='admin'){await $('load-dashboard').onclick();}if(portalRole==='superuser'){await loadAccounts();await loadRegistrations();}});
-$('logout').onclick=()=>run(async()=>{if(access&&refresh)await api('/api/auth/logout/','POST',{refresh});access='';refresh='';$('session').textContent='Signed out';['my-enquiries','my-wishlist','my-notifications','leads','dashboard','pending-reviews','accounts-list','registrations-list'].filter(id=>$(id)).forEach(id=>$(id).replaceChildren());feedback('Signed out.');});
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.tab!=='catalog'&&(!access||mustChangePassword)){feedback(mustChangePassword?'Replace your temporary password first.':'Please sign in first.',true);return;}['catalog','customer','staff','supervision'].filter(id=>$(id)).forEach(id=>$(id).hidden=id!==b.dataset.tab);}));
+bind('login',async body=>{access='';refresh='';const tokens=await api(`/api/${portalRole}/login/`,'POST',body);access=tokens.access;refresh=tokens.refresh;const p=await api('/api/auth/profile/');$('session').textContent=`${p.username} · ${p.role}`;feedback('Signed in.');if(portalRole==='admin'){ mustChangePassword=p.must_change_password;$('employee-password').hidden=!p.must_change_password; $('staff').hidden=p.must_change_password;if(p.must_change_password){feedback('Replace your temporary password to access requirements.');return;}await $('load-dashboard').onclick();}if(portalRole==='superuser'){$('supervision').hidden=false;await loadAccounts();await loadRegistrations();}});
+$('logout').onclick=()=>run(async()=>{if(access&&refresh)await api('/api/auth/logout/','POST',{refresh});access='';refresh='';$('session').textContent='Signed out';['my-enquiries','my-wishlist','my-notifications','leads','dashboard','pending-reviews','accounts-list','registrations-list','issued-credentials'].filter(id=>$(id)).forEach(id=>$(id).replaceChildren());mustChangePassword=false;if(portalRole!=='user'){$('staff').hidden=true;if($('supervision'))$('supervision').hidden=true;}if($('employee-password')){$('employee-password').hidden=true;$('employee-password').reset();}feedback('Signed out.');});
 async function services(url='/api/services/'){const p=await api(url);nextServices=p.next;$('more-services').hidden=!nextServices;list('services',rows(p),s=>{const c=el('article',undefined,'card');c.append(el('h3',s.name),el('p',s.description),el('p',`From ₹${s.starting_price}`,'price'));c.append(button('Details',()=>detail(s.id)),button('Enquire',()=>{$('service-choice').value=s.id;$('enquiry').scrollIntoView({behavior:'smooth'});}),button('Save',async()=>{requireLogin();await api('/api/wishlist/','POST',{service:s.id});feedback('Saved to wishlist.');}));return c;});}
 async function detail(id){const s=await api(`/api/services/${id}/`);const box=$('service-detail');box.hidden=false;box.replaceChildren(el('h2',s.name),el('p',s.description));(s.features||[]).forEach(f=>box.append(el('p',`• ${f}`)));s.images.forEach(image=>{const img=el('img');img.src=image.image;img.alt=image.alt_text;box.append(img);});s.packages.forEach(p=>box.append(el('p',`${p.name}: ₹${p.price} — ${p.description}`)));const reviews=await api(`/api/reviews/?service=${id}`);rows(reviews).forEach(r=>box.append(el('p',`${r.rating}/5 — ${r.comment}`)));const related=await api(`/api/services/${id}/related/`);box.append(el('h3','Related services'));related.forEach(r=>box.append(button(r.name,()=>detail(r.id))));box.scrollIntoView({behavior:'smooth'});}
 bind('search',body=>services('/api/services/?'+new URLSearchParams(body)));$('more-services').onclick=()=>run(()=>services(nextServices));
@@ -42,18 +42,25 @@ const started=Date.now();
 run(async()=>{const p=await api('/api/categories/');rows(p).forEach(c=>{const o=el('option',c.name);o.value=c.id;$('categories').append(o);});const s=await api('/api/services/?ordering=name');rows(s).forEach(service=>{const o=el('option',service.name);o.value=service.id;$('service-choice').append(o);});await services();});
 
 // Each interface has its own role-specific login; API permissions also enforce access.
-if(portalRole!=='user') { $('catalog').hidden=true; $('customer').hidden=true; $('staff').hidden=portalRole!=='admin'; }
+if(portalRole!=='user') { $('catalog').hidden=true; $('customer').hidden=true; $('staff').hidden=true;if($('supervision'))$('supervision').hidden=true; }
 let nextAccounts=null,nextRegistrations=null;
 async function loadAccounts(url='/api/admin/accounts/') {
   requireLogin(); const p=await api(url);nextAccounts=p.next;$('more-accounts').hidden=!nextAccounts;
   list('accounts-list',rows(p),account=>{const c=el('article',undefined,'card');c.append(el('h3',account.username),el('p',`${account.email} · ${account.role} · ${account.is_active?'Active':'Inactive'}`));
     c.append(button(account.is_active?'Deactivate':'Activate',async()=>{await api(`/api/admin/accounts/${account.id}/`,'PATCH',{is_active:!account.is_active});await loadAccounts();}));return c;});
 }
-async function loadRegistrations(url='/api/superuser/admin-registrations/') {
-  requireLogin();const p=await api(url);nextRegistrations=p.next;$('more-registrations').hidden=!nextRegistrations;
-  list('registrations-list',rows(p),application=>{const c=el('article',undefined,'card');c.append(el('h3',application.username),el('p',`${application.email} · ${application.status}`));
-    if(application.status==='PENDING') ['APPROVED','REJECTED'].forEach(status=>c.append(button(status==='APPROVED'?'Approve admin':'Reject',async()=>{await api(`/api/superuser/admin-registrations/${application.id}/decision/`,'POST',{status});await loadRegistrations();await loadAccounts();})));return c;});
+function showCredentials(credentials) {
+  const box=$('issued-credentials');box.replaceChildren();
+  if(credentials){box.append(el('h3','Temporary credentials — shown once'),el('p',`Login ID: ${credentials.username}`),el('p',`Temporary password: ${credentials.temporary_password}`),el('p','Share privately with the verified employee. They must replace the password at first login.'),button('Clear credentials',()=>box.replaceChildren()));}
 }
+async function loadRegistrations(url='/api/superuser/recovery-requests/') {
+  requireLogin();const p=await api(url);nextRegistrations=p.next;$('more-registrations').hidden=!nextRegistrations;
+  list('registrations-list',rows(p),application=>{const c=el('article',undefined,'card');c.append(el('h3',application.username),el('p',`${application.email} · ${application.status}`),el('p',application.reason));
+    if(application.status==='PENDING') ['RESET','REJECT'].forEach(decision=>c.append(button(decision==='RESET'?'Identity verified — issue password':'Reject request',async()=>{const r=await api(`/api/superuser/recovery-requests/${application.id}/decision/`,'POST',{decision});showCredentials(r.credentials);await loadRegistrations();})));return c;});
+}
+if($('employee-create')) bind('employee-create',async(body,form)=>{const r=await api('/api/superuser/employees/','POST',body);form.reset();showCredentials(r);await loadAccounts();feedback('Employee admin account created.');});
+if($('admin-recovery')) bind('admin-recovery',async(body,form)=>{const r=await api('/api/admin/recovery-request/','POST',body);form.reset();feedback(r.message);});
+if($('employee-password')) bind('employee-password',async(body,form)=>{await api('/api/auth/password/change/','POST',body);form.reset();form.hidden=true;access='';refresh='';$('staff').hidden=true;feedback('Password changed. Sign in with your new password.');$('session').textContent='Signed out';});
 if($('account-filter')) {bind('account-filter',body=>loadAccounts('/api/admin/accounts/?'+new URLSearchParams(body)));$('more-accounts').onclick=()=>run(()=>loadAccounts(nextAccounts));$('load-registrations').onclick=()=>run(()=>loadRegistrations());$('more-registrations').onclick=()=>run(()=>loadRegistrations(nextRegistrations));}
 
 if(portalRole!=='user') feedback('Sign in to load your workspace.');
