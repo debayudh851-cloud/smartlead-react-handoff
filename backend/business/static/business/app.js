@@ -3,7 +3,7 @@
 let access = '', refresh = '', nextServices = null, nextLeads = null, mustChangePassword=false;
 const portalRole=document.body.dataset.role || 'user';
 const $ = id => document.getElementById(id);
-function syncSignOut(){ $('logout').hidden=!access; }
+function syncSignOut(){ $('logout').hidden=!access; $('session').hidden=!access; }
 const feedback = (message, error=false) => { $('feedback').textContent=message; $('feedback').classList.toggle('error',error); };
 async function api(url, method='GET', body=null, retried=false, extra={}) {
   const headers={...extra}; if(access) headers.Authorization=`Bearer ${access}`;
